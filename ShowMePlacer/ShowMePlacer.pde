@@ -1,7 +1,7 @@
 DrawScene ds; //<>//
 int curScene = 1;
-boolean dibu = true;
 int sum = 0;
+int sc3st = 100;
 void setup() {
   fullScreen(2);
   background(0);
@@ -10,45 +10,43 @@ void setup() {
   noLoop();
 }
 void draw() {
-  if (dibu) {
-    switch(curScene){
-      case 1:
-        ds.scene1();
-        break;
-      case 2:
-        if(sum > 0)
-          sum = ds.scene2_update(sum);
-        else        
-          ds.scene2();
-        break;
-      case 3:
+  switch(curScene){
+    case 1:
+      ds.scene1();
+      break;
+    case 2:
+      if(sum > 0)
+        sum = ds.scene2_update(sum);
+      else        
+        ds.scene2();
+      break;
+    case 3:
+      if(sc3st == 100)
         ds.scene3();
-        break;        
-    }    
+      else
+        ds.scene3_update(sc3st);
+      break;    
   }
-  dibu = false;
 }
 void mouseClicked() {
-  if(curScene == 1 && ds.bStart.MouseIsOver()){
-    dibu = true;
-    curScene = 2;
-    redraw();
-  }
+  if(curScene == 3){
+   sc3st = ds.sc3_checkbuttons();
+   if (sc3st == 99) curScene = 2;
+   redraw();
+  }    
   if(curScene == 2){
     if(ds.go.MouseIsOver()){
-      dibu = true;
       curScene = 3;
-      redraw();
-    }
-    if(ds.plSc2.MouseIsOver()){
-      dibu = true;
+      sc3st = 100;
+    } else if(ds.plSc2.MouseIsOver()){
       sum = 1;
-      redraw();
-    }
-    if(ds.mnSc2.MouseIsOver()){
-      dibu = true;
+    } else if(ds.mnSc2.MouseIsOver()){
       sum = 2;
-      redraw();
-    }     
-  } 
+    }
+    redraw();
+  }
+  if(curScene == 1 && ds.bStart.MouseIsOver()){
+    curScene = 2;
+    redraw();
+  }  
 }

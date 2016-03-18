@@ -1,7 +1,9 @@
 class DrawScene { 
   PFont f;
-  Button bStart,go,plSc2,mnSc2;
+  Button bStart,go,plSc2,mnSc2,back;
+  Grid gridL;
   int blocks = 6;
+  int sc3state;
 
   DrawScene() {  
     f = createFont("Arial", 18, true); 
@@ -9,6 +11,8 @@ class DrawScene {
     go = new Button(color(112, 173, 71), "GO", width/2-50, height/2+100, 100, 60, 50);
     plSc2 = new Button(color(112, 173, 71), "+", width/2+50, height/2-50, 40, 40, 35);
     mnSc2 = new Button(color(112, 173, 71), "-", width/2-90, height/2-50, 40, 40, 35);
+    back = new Button(color(112, 173, 71), "Back", width/2+200, height/2+345, 85, 40, 30);
+    gridL = new Grid();
   }
   void scene1() {
     rectMode(CENTER);
@@ -47,8 +51,10 @@ class DrawScene {
   }
   int scene2_update(int sum) {
     int a = sum;
-    if (a == 1)
-      blocks++;
+    if (a == 1){
+      if(blocks < 40)
+        blocks++;
+    }
     else{
       if (blocks > 6)
         blocks--;
@@ -65,6 +71,29 @@ class DrawScene {
   void scene3() {
     rectMode(CENTER);
     fill(218, 227, 243);  
-    rect(width/2, height/2, 600, 800); 
+    rect(width/2, height/2, 600, 800);
+    strokeWeight(1);
+    fill(237, 237, 237);  
+    rectMode(CORNER);
+    rect(width/2-295, height/2-360, 290, 750);
+    rect(width/2+5, height/2-360, 290, 750);
+    fill(124, 124, 124);
+    rect(width/2-290, height/2+130, 280, 250);
+    back.Draw();
+    gridL.UpNDraw(blocks);
   }  
+  int sc3_checkbuttons() {
+    //sc3state = 98; // nothing changed
+    if (back.MouseIsOver())
+      sc3state = 99;
+    for(int i=0; i<blocks; i++){
+      if (gridL.snodes[i].MouseIsOver())
+        sc3state = i;
+    }
+    return sc3state;
+  }   
+  void scene3_update(int state) {
+    //if (state != 98)  // nothing changed state
+      gridL.snodes[state].upButton();
+  }   
 }
