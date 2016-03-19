@@ -3,7 +3,8 @@ class DrawScene {
   Button bStart,go,plSc2,mnSc2,back;
   Grid gridL;
   int blocks = 6;
-  int sc3state;
+  int sc3Bstate = 50;
+  int scState = 0;  
 
   DrawScene() {  
     f = createFont("Arial", 18, true); 
@@ -25,6 +26,13 @@ class DrawScene {
     textAlign(CENTER, TOP);
     text("Placer", width/2, height/3);
     bStart.Draw();
+  }
+  int sc1_CheckAndUpdate() {  
+    if(bStart.MouseIsOver()){
+      scState = 1;
+      scene2();
+    }      
+    return scState;
   }
   void scene2() {
     String inst = "Use mouse clicks to create connections between blocks. Available spots for connections are visual dots on the edges of blocks. Use the + and – buttons to add external IO that can be used to connect blocks as well. To come back to this screen, use the back button.";
@@ -49,24 +57,33 @@ class DrawScene {
     plSc2.Draw();
     mnSc2.Draw();    
   }
-  int scene2_update(int sum) {
-    int a = sum;
-    if (a == 1){
-      if(blocks < 40)
+  int sc2_CheckAndUpdate() {  
+    if(plSc2.MouseIsOver()){
+      if(blocks < 40){
         blocks++;
-    }
-    else{
-      if (blocks > 6)
+        sc2_UpBlocks();
+      }
+    } 
+    else if(mnSc2.MouseIsOver()){
+      if (blocks > 6){
         blocks--;
-    }    
+        sc2_UpBlocks();
+      }
+    } 
+    else if(go.MouseIsOver()){
+      scState = 2;
+      scene3();
+    }     
+    return scState;
+  }  
+  void sc2_UpBlocks() {   
     rectMode(CENTER);
     fill(47, 85, 151); 
     rect(width/2, height/2-30, 80, 40);     
     fill(0);  
     textAlign(CENTER, BOTTOM);
     textFont(f, 35); 
-    text(blocks, width/2, height/2-10);      
-    return 0;
+    text(blocks, width/2, height/2-10);
   }
   void scene3() {
     rectMode(CENTER);
@@ -82,18 +99,21 @@ class DrawScene {
     back.Draw();
     gridL.UpNDraw(blocks);
   }  
-  int sc3_checkbuttons() {
-    //sc3state = 98; // nothing changed
-    if (back.MouseIsOver())
-      sc3state = 99;
-    for(int i=0; i<blocks; i++){
-      if (gridL.snodes[i].MouseIsOver())
-        sc3state = i;
+  int sc3_CheckAndUpdate() {
+    if (back.MouseIsOver()){
+      scState = 1;
+      scene2();
     }
-    return sc3state;
-  }   
-  void scene3_update(int state) {
-    //if (state != 98)  // nothing changed state
-      gridL.snodes[state].upButton();
-  }   
+    else{
+      sc3Bstate = 50;  //reset buttons state
+      for(int i=0; i<blocks; i++){
+       if (gridL.snodes[i].MouseIsOver())
+         sc3Bstate = i;
+      }
+      if (sc3Bstate!= 50){
+        gridL.snodes[sc3Bstate].upButton();
+      }
+    }
+    return scState;
+  }    
 }
