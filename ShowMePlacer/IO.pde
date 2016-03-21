@@ -1,18 +1,22 @@
-class Nodes {
+class IO {
   int nNodes;
   int x0m,y0m;
-  color c,bc;
-  int size = 40;
+  color c = #FFFFFF;
+  color bc;
+  int xsize = 40;
+  int ysize = 15;
   int bsize = 5;
   boolean en = false;
   boolean sel = false;  
   PFont f;
-  int fs = 18;   // font size
+  int fs = 16;   // font size
   int l;
   int id;
+  int IorO;
   
-  Nodes(int ID) {
+  IO(int ID, int InOrOut) {
     id = ID;
+    IorO = InOrOut;
   }
   void Draw(PFont font, int label) {
     if (en){
@@ -22,25 +26,29 @@ class Nodes {
       strokeWeight(2);
       rectMode(CENTER);
       fill(c); 
-      rect(x0m, y0m, size, size, 7);
+      rect(x0m, y0m, xsize, ysize, 7);
       fill(0); 
       rect(x0m, y0m, bsize, bsize);      
       textAlign(CENTER, CENTER);
       fill(0);
       textFont(f, fs);    
-      text(label, x0m+8, y0m+8);
+      text(label, x0m+10, y0m-2);  
     }
   }
-  void Update(boolean Enabled,int Xpos, int Ypos, color Color) {
+  void Update(boolean Enabled,int Xpos, int Ypos) {
     x0m = Xpos;
     y0m = Ypos;
-    c = Color;
     en = Enabled;
   }  
   void Clear() {
-    x0m = 0;
-    y0m = 0;
-    en = false;
+    if (en){
+      en = false;
+      stroke(237, 237, 237);
+      strokeWeight(3);
+      rectMode(CENTER);
+      fill(237, 237, 237); 
+      rect(x0m, y0m, xsize, ysize, 7);
+    }
   }
   boolean MouseIsOver() {
     if (mouseX > x0m-8 && mouseX < x0m+8 && mouseY > y0m-8 && mouseY < y0m+8) {

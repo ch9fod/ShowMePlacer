@@ -1,9 +1,13 @@
 class DrawScene { 
   PFont f;
-  Button bStart,go,plSc2,mnSc2,back;
+  Button bStart,go,plSc2,mnSc2,back,pI,mI,pO,mO,createNet,clear,pStart;
   Grid gridL;
   int blocks = 6;
+  int I = 1;
+  int O = 1;
   int sc3Bstate = 50;
+  int sc3Ib = 10;
+  int sc3Ob = 10;
   int scState = 0;  
 
   DrawScene() {  
@@ -13,6 +17,13 @@ class DrawScene {
     plSc2 = new Button(color(112, 173, 71), "+", width/2+50, height/2-50, 40, 40, 35);
     mnSc2 = new Button(color(112, 173, 71), "-", width/2-90, height/2-50, 40, 40, 35);
     back = new Button(color(112, 173, 71), "Back", width/2+200, height/2+345, 85, 40, 30);
+    pI = new Button(color(112, 173, 71), "+", width/2-290, height/2+95, 25, 20, 25);
+    mI = new Button(color(112, 173, 71), "-", width/2-290, height/2-360, 25, 20, 25);
+    pO = new Button(color(112, 173, 71), "+", width/2-35, height/2+95, 25, 20, 25);
+    mO = new Button(color(112, 173, 71), "-", width/2-35, height/2-360, 25, 20, 25);
+    createNet = new Button(color(112, 173, 71), "Create", width/2-290, height/2+120, 80, 30, 25);
+    clear = new Button(color(112, 173, 71), "Clear", width/2-190, height/2+120, 80, 30, 25);
+    pStart = new Button(color(112, 173, 71), "Start", width/2-90, height/2+120, 80, 30, 25);
     gridL = new Grid();
   }
   void scene1() {
@@ -59,7 +70,7 @@ class DrawScene {
   }
   int sc2_CheckAndUpdate() {  
     if(plSc2.MouseIsOver()){
-      if(blocks < 40){
+      if(blocks < 36){
         blocks++;
         sc2_UpBlocks();
       }
@@ -95,24 +106,68 @@ class DrawScene {
     rect(width/2-295, height/2-360, 290, 750);
     rect(width/2+5, height/2-360, 290, 750);
     fill(124, 124, 124);
-    rect(width/2-290, height/2+130, 280, 250);
+    rect(width/2-290, height/2+160, 280, 220);
     back.Draw();
-    gridL.UpNDraw(blocks);
+    createNet.Draw();
+    clear.Draw();
+    pStart.Draw();
+    pI.Draw();
+    mI.Draw();
+    pO.Draw();
+    mO.Draw();
+    gridL.UpNDraw(blocks, I, O);
   }  
   int sc3_CheckAndUpdate() {
     if (back.MouseIsOver()){
       scState = 1;
       scene2();
     }
+    else if(pI.MouseIsOver()){
+      if(I<9){
+        I++;
+        gridL.UpNDrawIO(I,O);
+      }      
+    }
+    else if(mI.MouseIsOver()){
+      if(I>0){
+        I--;
+        gridL.UpNDrawIO(I,O);
+      }      
+    }
+    else if(pO.MouseIsOver()){
+      if(O<9){
+        O++;
+        gridL.UpNDrawIO(I,O);
+      }      
+    }
+    else if(mO.MouseIsOver()){
+      if(O>0){
+        O--;
+        gridL.UpNDrawIO(I,O);
+      }      
+    }
     else{
       sc3Bstate = 50;  //reset buttons state
+      sc3Ib = 10;  //reset buttons state
+      sc3Ob = 10;  //reset buttons state
       for(int i=0; i<blocks; i++){
-       if (gridL.snodes[i].MouseIsOver())
-         sc3Bstate = i;
+        if (gridL.snodes[i].MouseIsOver())
+          sc3Bstate = i;
       }
-      if (sc3Bstate!= 50){
-        gridL.snodes[sc3Bstate].upButton();
+      for(int i=0; i<I; i++){
+        if (gridL.Is[i].MouseIsOver())
+        sc3Ib = i;
       }
+      for(int i=0; i<O; i++){
+        if (gridL.Os[i].MouseIsOver())
+         sc3Ob = i;
+      }
+      if (sc3Bstate!= 50)
+        gridL.snodes[sc3Bstate].upButton();      
+      if (sc3Ib!= 10)
+       gridL.Is[sc3Ib].upButton();      
+      if (sc3Ob!= 10)
+       gridL.Os[sc3Ob].upButton();      
     }
     return scState;
   }    
