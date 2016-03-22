@@ -8,7 +8,11 @@ class DrawScene {
   int sc3Bstate = 50;
   int sc3Ib = 10;
   int sc3Ob = 10;
-  int scState = 0;  
+  int scState = 0;
+  String sNets = "";
+  int iNets = 0;
+  int defRectMode = CORNER;
+  int curRectMode;
 
   DrawScene() {  
     f = createFont("Arial", 18, true); 
@@ -27,7 +31,8 @@ class DrawScene {
     gridL = new Grid();
   }
   void scene1() {
-    rectMode(CENTER);
+    curRectMode = CENTER;
+    rectMode(curRectMode);
     fill(218, 227, 243);  
     rect(width/2, height/2, 600, 800);  
     textFont(f, 120); 
@@ -36,6 +41,7 @@ class DrawScene {
     text("ShowMe", width/2, height/3);
     textAlign(CENTER, TOP);
     text("Placer", width/2, height/3);
+    curRectMode = defRectMode;
     bStart.Draw();
   }
   int sc1_CheckAndUpdate() {  
@@ -53,7 +59,8 @@ class DrawScene {
     fill(47, 85, 151); 
     rect(width/2, height/2-30, 80, 40);     
     fill(0);  
-    textFont(f, 70); 
+    textFont(f, 70);
+    textAlign(CENTER, TOP);
     text("Set the complexity", width/2, height/4);
     textFont(f, 50); 
     text("Number of Blocks", width/2, height/3+40);
@@ -116,6 +123,8 @@ class DrawScene {
     pO.Draw();
     mO.Draw();
     gridL.UpNDraw(blocks, I, O);
+    sNets = "";
+    iNets = 0;
   }  
   int sc3_CheckAndUpdate() {
     if (back.MouseIsOver()){
@@ -146,6 +155,9 @@ class DrawScene {
         gridL.UpNDrawIO(I,O);
       }      
     }
+    else if(createNet.MouseIsOver()){
+      createNDispNet();
+    }
     else{
       sc3Bstate = 50;  //reset buttons state
       sc3Ib = 10;  //reset buttons state
@@ -163,12 +175,60 @@ class DrawScene {
          sc3Ob = i;
       }
       if (sc3Bstate!= 50)
-        gridL.snodes[sc3Bstate].upButton();      
+        gridL.snodes[sc3Bstate].upButton(true);      
       if (sc3Ib!= 10)
-       gridL.Is[sc3Ib].upButton();      
+       gridL.Is[sc3Ib].upButton(true);      
       if (sc3Ob!= 10)
-       gridL.Os[sc3Ob].upButton();      
+       gridL.Os[sc3Ob].upButton(true);      
     }
     return scState;
-  }    
+  }
+  void createNDispNet(){
+    sNets = sNets + "net" + iNets + ":";
+    for(int i=0; i<I; i++){
+      if (gridL.Is[i].isSel()){
+        if(sNets.charAt(sNets.length()-1) == ',' || sNets.charAt(sNets.length()-1) == ':')
+          sNets = sNets + "I" + i;
+        else
+          sNets = sNets + "," + "I" + i;
+      }
+    }
+    for(int i=0; i<O; i++){
+      if (gridL.Os[i].isSel()){
+        if(sNets.charAt(sNets.length()-1) == ',' || sNets.charAt(sNets.length()-1) == ':')
+          sNets = sNets + "O" + i;
+        else
+          sNets = sNets + "," + "O" + i;
+      }
+    }
+    for(int i=0; i<blocks; i++){
+      if (gridL.snodes[i].isSel()){
+        if(sNets.charAt(sNets.length()-1) == ',' || sNets.charAt(sNets.length()-1) == ':')
+          sNets = sNets + i;
+        else
+          sNets = sNets + "," + i;  
+      }
+    }
+    sNets = sNets + "; ";
+    unSelAll();
+    rectMode(CORNER);
+    fill(124, 124, 124);
+    rect(width/2-290, height/2+160, 280, 220);    
+    textAlign(LEFT);
+    textFont(f, 20);
+    fill(0);
+    text(sNets, width/2-290, height/2+160, 280, 220);     
+    iNets++;    
+  }
+  void unSelAll(){
+    for(int i=0; i<blocks; i++){
+      gridL.snodes[i].upButton(false);
+    }
+    for(int i=0; i<I; i++){
+      gridL.Is[i].upButton(false);
+    }
+    for(int i=0; i<O; i++){
+      gridL.Os[i].upButton(false);
+    }
+  }
 }

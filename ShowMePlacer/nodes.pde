@@ -48,16 +48,26 @@ class Nodes {
     }
     return false;
   }
-  void upButton() {
-    if (sel)
-      bc = 0;      
-    else
-      bc = #FFFFFF;
+  void upButton(boolean toogle) {
+    if (toogle){
+      if (sel)
+        bc = 0;      
+      else
+        bc = #FFFFFF;
+      sel = !sel;
+    }        
+    else{
+      sel = false;
+      bc = 0;
+    }
     fill(bc);
     stroke(0);
-    strokeWeight(2);    
+    strokeWeight(2); 
+    rectMode(CENTER);
     rect(x0m, y0m, bsize, bsize);
-    sel = !sel;
-    println(id);
+    //println(id);  
+  }  
+  boolean isSel() {
+    return sel;
   }  
 }
