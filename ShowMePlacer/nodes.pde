@@ -8,15 +8,13 @@ class Nodes {
   boolean sel = false;  
   PFont f;
   int fs = 18;   // font size
-  int l;
   int id;
   
   Nodes(int ID) {
     id = ID;
   }
-  void Draw(PFont font, int label) {
+  void Draw(PFont font) {
     if (en){
-      l = label;
       f = font;
       stroke(0);
       strokeWeight(2);
@@ -28,7 +26,7 @@ class Nodes {
       textAlign(CENTER, CENTER);
       fill(0);
       textFont(f, fs);    
-      text(label, x0m+8, y0m+8);
+      text(id, x0m+8, y0m+8);
     }
   }
   void Update(boolean Enabled,int Xpos, int Ypos, color Color) {
@@ -69,5 +67,12 @@ class Nodes {
   }  
   boolean isSel() {
     return sel;
+  }  
+  void UpInit(int x1){
+    x0m = x0m + x1;
+  }   
+  void UpLoc(int x1, int y1){
+    x0m = x1;
+    y0m = y1;
   }  
 }

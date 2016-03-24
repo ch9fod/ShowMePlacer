@@ -18,9 +18,8 @@ class IO {
     id = ID;
     IorO = InOrOut;
   }
-  void Draw(PFont font, int label) {
+  void Draw(PFont font) {
     if (en){
-      l = label;
       f = font;
       stroke(0);
       strokeWeight(2);
@@ -32,7 +31,7 @@ class IO {
       textAlign(CENTER, CENTER);
       fill(0);
       textFont(f, fs);    
-      text(label, x0m+10, y0m-2);  
+      text(id, x0m+10, y0m-2);  
     }
   }
   void Update(boolean Enabled,int Xpos, int Ypos) {
@@ -78,4 +77,7 @@ class IO {
   boolean isSel() {
     return sel;
   }
+  void UpInit(int x1){
+    x0m = x1;
+  }  
 }

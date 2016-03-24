@@ -25,7 +25,7 @@ class Grid {
     }  
     for(int i=0; i<Os.length; i++) {
         Os[i] = new IO(i,0);
-    }   
+    }      
   }
   void UpNDraw(int Nodes, int inputs, int outputs){
     for(int k=0; k<snodes.length; k++) {
@@ -35,7 +35,7 @@ class Grid {
     int j = 0, i = 0 ,n = 0;    
      while(n<nNodes){
        snodes[n].Update(true, x0+(size+10)*i, y0+(size+10)*j, getCol());
-       snodes[n].Draw(f,n);
+       snodes[n].Draw(f);
        i++;
        if(i>3){
          j++;
@@ -61,11 +61,38 @@ class Grid {
     int out = outputs;    
     for(int i=0; i<in; i++){
       Is[i].Update(true, Ix0, Iy0+(size+10)*i);
-      Is[i].Draw(f,i);
+      Is[i].Draw(f);
     }    
     for(int i=0; i<out; i++){
      Os[i].Update(true, Ix0+240, Iy0+(size+10)*i);
-     Os[i].Draw(f,i);
+     Os[i].Draw(f);
     }    
+  }
+  void UpInitials(int x1){
+    Ix0 = Ix0 + x1;
+    for(int i=0; i<snodes.length;i++){
+      if(snodes[i].en){
+        snodes[i].UpInit(x1);
+        snodes[i].Draw(f);
+      }
+    }
+    for(int i=0; i<Is.length;i++){
+      if(Is[i].en){
+        Is[i].UpInit(Ix0);
+        Is[i].Draw(f);
+      }
+    }
+    for(int i=0; i<Os.length;i++){
+      if(Os[i].en){
+        Os[i].UpInit(Ix0+240);
+        Os[i].Draw(f);
+      }
+    }
+  }
+  void ReDraw(){
+    for(int i=0; i<snodes.length;i++){
+      if(snodes[i].en)
+        snodes[i].Draw(f);
+    }
   }
 }
