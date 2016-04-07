@@ -31,7 +31,8 @@ class IO {
       textAlign(CENTER, CENTER);
       fill(0);
       textFont(f, fs);    
-      text(id, x0m+10, y0m-2);  
+      text(id, x0m+10, y0m-2); 
+      redraw();
     }
   }
   void Update(boolean Enabled,int Xpos, int Ypos) {
@@ -50,7 +51,7 @@ class IO {
     }
   }
   boolean MouseIsOver() {
-    if (mouseX > x0m-8 && mouseX < x0m+8 && mouseY > y0m-8 && mouseY < y0m+8) {
+    if (mouseX > x0m-10 && mouseX < x0m+10 && mouseY > y0m-10 && mouseY < y0m+10) {
       return true;
     }
     return false;

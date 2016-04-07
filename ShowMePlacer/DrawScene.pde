@@ -1,7 +1,9 @@
 class DrawScene { 
+  String demoNet = "net0:I0,2;net1:I1,6;net2:I2,10;net3:I3,14;net4:I4,18;net5:I5,22;net6:I6,26;net7:I7,30;net8:I8,34;net9:O0,1;net10:O1,5;net11:O2,9;net12:O3,13;net13:O4,17;net14:O5,21;net15:O6,25;net16:O7,29;net17:O8,33;net18:0,3;net19:4,7;net20:8,11;net21:12,15;net21:16,19;net22:20,23;net23:24,27;net24:28,31;net25:32,35;"; 
   PFont f;
-  Button bStart,go,plSc2,mnSc2,back,pI,mI,pO,mO,createNet,clear,pStart;
-  Grid gridL,gridR,gridBest;
+  Button bStart,go,plSc2,mnSc2,back,pI,mI,pO,mO,createNet,clear,pStart,demo;
+  TInput Ttemp, Tdecay, TImin;
+  Grid gridL;
   int blocks = 6;
   int I = 1;
   int O = 1;
@@ -17,15 +19,17 @@ class DrawScene {
   int b1=0, b2=0;  //blocks to exchange
   Nets[] nets = new Nets[100];
   IntList xS, yS;
-  float T0 = 3500;
-  float Tmin = 25;
+  float T0 = 5000;
+  float Tmin = 5;
   float alpha = 0.99;
-  int best_cost;
+  int best_cost, curr_cost, initial_cost;
+  boolean started = false;
 
   DrawScene() {  
     f = createFont("Arial", 18, true); 
     bStart = new Button(color(112, 173, 71), "Start!", width/2-100, height/2, 200, 100, 60);
-    go = new Button(color(112, 173, 71), "GO", width/2-50, height/2+100, 100, 60, 50);
+    go = new Button(color(112, 173, 71), "GO", width/2-120, height/2+50, 100, 60, 50);
+    demo = new Button(color(112, 173, 71), "Demo", width/2, height/2+50, 140, 60, 50);
     plSc2 = new Button(color(112, 173, 71), "+", width/2+50, height/2-50, 40, 40, 35);
     mnSc2 = new Button(color(112, 173, 71), "-", width/2-90, height/2-50, 40, 40, 35);
     back = new Button(color(112, 173, 71), "Back", width/2+200, height/2+345, 85, 40, 30);
@@ -36,9 +40,10 @@ class DrawScene {
     createNet = new Button(color(112, 173, 71), "Create", width/2-290, height/2+120, 80, 30, 25);
     clear = new Button(color(112, 173, 71), "Clear", width/2-190, height/2+120, 80, 30, 25);
     pStart = new Button(color(112, 173, 71), "Start", width/2-90, height/2+120, 80, 30, 25);
+    Ttemp = new TInput("T0:", str(T0), width/2-260, height/2-395, 100, 25, 20, 7);
+    TImin = new TInput("Tmin:", str(Tmin), width/2, height/2-395, 60, 25, 20, 4);
+    Tdecay = new TInput("Decay:", str(alpha), width/2+200, height/2-395, 80, 25, 20, 5);
     gridL = new Grid();
-    gridR = new Grid();
-    gridBest = new Grid();
     for(int i=0; i<nets.length; i++) {
         nets[i] = new Nets(i);
     }
@@ -46,6 +51,7 @@ class DrawScene {
     yS = new IntList();
   }
   void scene1() {
+    String disc = "ShowMe Placer IS NOT A GAME. This is a visualization program. It uses Simulated Annealing to create an optimized placement. It starts from an inicial placement and a netlist the user creates. \n\nLIMITATIONS: \n  -The maximun of blocks is 36. \n  -Each node has a maximun of 3 blocks(IOs or blocks). \n  -The demo button creates a netlist for you with 36 blocks.";
     curRectMode = CENTER;
     rectMode(curRectMode);
     fill(218, 227, 243);  
@@ -58,6 +64,11 @@ class DrawScene {
     text("Placer", width/2, height/3);
     curRectMode = defRectMode;
     bStart.Draw();
+    textAlign(LEFT);
+    rectMode(CENTER);
+    textFont(f, 20);     
+    text("Disclaimer:", width/2-290, height/2+150);
+    text(disc, width/2, height/2+360, 585, 400);     
   }
   int sc1_CheckAndUpdate() {  
     if(bStart.MouseIsOver()){
@@ -67,7 +78,7 @@ class DrawScene {
     return scState;
   }
   void scene2() {
-    String inst = "Use mouse clicks to create connections between blocks. Available spots for connections are visual dots on the edges of blocks. Use the + and – buttons to add external IO that can be used to connect blocks as well. To come back to this screen, use the back button.";
+    String inst = "Use mouse clicks to create connections between blocks. Available spots for connections are visual dots on the middle of blocks. Use the + and – buttons to add external IO that can be used to connect blocks as well. This IO blocks are static. Since this program use simulated annealing to do the placement, you can also edit the algorithm variables like temperatures and decay. For this, you have to click to edit and click to finish editing. Press the demo button to use a 36 blocks, 18 IOs and a netlist pre-created for demo purposes. Press Start for begin placing. Clear to start over. To come back to this screen, use the back button.";
     rectMode(CENTER);
     fill(218, 227, 243);  
     rect(width/2, height/2, 600, 800);
@@ -84,9 +95,11 @@ class DrawScene {
     text(blocks, width/2, height/2-10);      
     textAlign(LEFT);
     textFont(f, 20);     
-    text("Instructions:", width/2-290, height/2+190);
-    text(inst, width/2, height/2+400, 585, 400);    
+    text("Instructions:", width/2-292, height/2+145);
+    textFont(f, 18); 
+    text(inst, width/2, height/2+350, 585, 400);    
     go.Draw();
+    demo.Draw();
     plSc2.Draw();
     mnSc2.Draw();    
   }
@@ -105,6 +118,13 @@ class DrawScene {
     } 
     else if(go.MouseIsOver()){
       scState = 2;
+      scene3();
+    } 
+    else if(demo.MouseIsOver()){
+      scState = 2;
+      blocks = 36;
+      I = 9;
+      O = 9;
       scene3();
     }     
     return scState;
@@ -137,6 +157,12 @@ class DrawScene {
     mI.Draw();
     pO.Draw();
     mO.Draw();
+    Ttemp.DrawRec(false);
+    Ttemp.DrawLabel();
+    Tdecay.DrawRec(false);
+    Tdecay.DrawLabel();
+    TImin.DrawRec(false);
+    TImin.DrawLabel();
     gridL.UpNDraw(blocks, I, O);
     clearAll();
   }  
@@ -178,6 +204,18 @@ class DrawScene {
     else if(clear.MouseIsOver()){
       clearAll();
     }
+    else if(Ttemp.MouseIsOver()){
+      if(!Tdecay.IsEn() && !TImin.IsEn())
+        Ttemp.Toogle();
+    }
+    else if(Tdecay.MouseIsOver()){
+      if(!Ttemp.IsEn() && !TImin.IsEn())
+        Tdecay.Toogle();
+    }
+    else if(TImin.MouseIsOver()){
+      if(!Ttemp.IsEn() && !Tdecay.IsEn())
+        TImin.Toogle();
+    }        
     else{
       sc3Bstate = 50;  //reset buttons state
       sc3Ib = 10;  //reset buttons state
@@ -261,22 +299,28 @@ class DrawScene {
     for(int i=0; i<nets.length; i++){
       nets[i].clearNet();
     }
+    if(started){
+      gridL.Reset();
+      gridL.UpNDraw(blocks, I, O);
+    }
     rectMode(CORNER);
     fill(124, 124, 124);
     rect(width/2-290, height/2+160, 280, 220);
+    fill(237, 237, 237);
+    rect(width/2+5, height/2-360, 290, 750);
+    back.Draw();
   }  
   void business(){
-    //int promedio=0;
+    started = true;
     float T;
     int k = 0;
-    int curr_cost;
     int trial_cost;
     int ch_cost;
-    gridR = gridL;
-    gridR.UpInitials(300);
-    gridBest = gridR;
+    int bad_moves = 0;
+    gridL.UpInitials(300);
     T = T0;
     curr_cost = Lcost();
+    initial_cost = curr_cost;
     best_cost = curr_cost;
     while(T > Tmin){
       //ADD STOP BUTTON HERE?
@@ -289,34 +333,34 @@ class DrawScene {
         println("current cost =",curr_cost,"iteration =",k);
         if(curr_cost < best_cost){
           best_cost = curr_cost;
-          gridBest = gridR;
         }
       }
       else{
         r = random(0,1);
         if(r < exp(-ch_cost/T)){
           curr_cost = trial_cost;
+          bad_moves++;
           println("bad term ACCEPTED","r =",r,"temp =",T,"exp =",exp(-ch_cost/T),"bad cost =",curr_cost,"iteration =",k);
         }
         else{
           XchangeX(true);
-          println("bad term REJECTED","r=",r,"temp=",T,"exp=",exp(-ch_cost/T),"bad cost=",curr_cost,"iteration=",k);
+          println("bad term REJECTED","r =",r,"temp=",T,"exp =",exp(-ch_cost/T),"bad cost =",curr_cost,"iteration =",k);
         }
       }
     T = T * alpha;  
     }
     println("total iterations =",k,"last cost =",curr_cost);
+    DrawEnd(k, bad_moves);
   }  
   void XchangeX(boolean back){
     int xt, yt;
     if(back){
-      //print(b1,b2);print(" Back ");
-      xt = gridR.snodes[b1].x0m;
-      yt = gridR.snodes[b1].y0m;
-      gridR.snodes[b1].UpLoc(gridR.snodes[b2].x0m,gridR.snodes[b2].y0m);
-      gridR.snodes[b2].UpLoc(xt,yt);  
-      gridR.snodes[b1].Draw(f);
-      gridR.snodes[b2].Draw(f);      
+      xt = gridL.snodes[b1].x0m;
+      yt = gridL.snodes[b1].y0m;
+      gridL.snodes[b1].UpLoc(gridL.snodes[b2].x0m,gridL.snodes[b2].y0m);
+      gridL.snodes[b2].UpLoc(xt,yt);  
+      gridL.snodes[b1].Draw(f);
+      gridL.snodes[b2].Draw(f);      
     }
     else{
       b1 = int(random(-1,blocks));
@@ -327,13 +371,12 @@ class DrawScene {
         else
           b2++;
       }
-      //print(b1,b2);print("  ");
-      xt = gridR.snodes[b1].x0m;
-      yt = gridR.snodes[b1].y0m;
-      gridR.snodes[b1].UpLoc(gridR.snodes[b2].x0m,gridR.snodes[b2].y0m);
-      gridR.snodes[b2].UpLoc(xt,yt);  
-      gridR.snodes[b1].Draw(f);
-      gridR.snodes[b2].Draw(f);
+      xt = gridL.snodes[b1].x0m;
+      yt = gridL.snodes[b1].y0m;
+      gridL.snodes[b1].UpLoc(gridL.snodes[b2].x0m,gridL.snodes[b2].y0m);
+      gridL.snodes[b2].UpLoc(xt,yt);  
+      gridL.snodes[b1].Draw(f);
+      gridL.snodes[b2].Draw(f);
     }
   }
   int Lcost(){
@@ -342,39 +385,54 @@ class DrawScene {
       if(nets[i].en){
         if(nets[i].Is.size()>0){
           for(int j=0;j<nets[i].Is.size();j++){
-            xS.append(gridR.Is[nets[i].Is.get(j)].x0m);
-            yS.append(gridR.Is[nets[i].Is.get(j)].y0m);
-            //print('I',nets[i].Is.get(j));print(" ");print(gridR.Is[nets[i].Is.get(j)].x0m);print(" ");print(gridR.Is[nets[i].Is.get(j)].y0m);print(" ");
+            xS.append(gridL.Is[nets[i].Is.get(j)].x0m);
+            yS.append(gridL.Is[nets[i].Is.get(j)].y0m);
           }
         }
         if(nets[i].Os.size()>0){
           for(int j=0;j<nets[i].Os.size();j++){
-            xS.append(gridR.Os[nets[i].Os.get(j)].x0m);
-            yS.append(gridR.Os[nets[i].Os.get(j)].y0m);
-            //print('O',nets[i].Os.get(j));print(" ");print(gridR.Os[nets[i].Os.get(j)].x0m);print(" ");print(gridR.Os[nets[i].Os.get(j)].y0m);print(" ");
+            xS.append(gridL.Os[nets[i].Os.get(j)].x0m);
+            yS.append(gridL.Os[nets[i].Os.get(j)].y0m);
           }
         }
         if(nets[i].nodes.size()>0){
           for(int j=0;j<nets[i].nodes.size();j++){
-            xS.append(gridR.snodes[nets[i].nodes.get(j)].x0m);
-            yS.append(gridR.snodes[nets[i].nodes.get(j)].y0m);
-            //print('N',nets[i].nodes.get(j));print(" ");print(gridR.snodes[nets[i].nodes.get(j)].x0m);print(" ");print(gridR.snodes[nets[i].nodes.get(j)].y0m);print(" ");
+            xS.append(gridL.snodes[nets[i].nodes.get(j)].x0m);
+            yS.append(gridL.snodes[nets[i].nodes.get(j)].y0m);
           }
         }
       }
       if(xS.size()>0){
         cost = cost + abs(xS.max()-xS.min()) + abs(yS.max()-yS.min());
         xS.clear();yS.clear();
-        //print(cost);
-        //print('\n');
       }
     }
     return cost;
   }
-  //void printNets(){
-  //  for(int i=0; i<nets.length; i++){
-  //    if(nets[i].en)
-  //      nets[i].printAll();
-  //  }  
-  //}
+  void CheckKey(){
+    if(Ttemp.IsEn()){
+      T0 = Ttemp.Update();
+    }
+    if(Tdecay.IsEn()){
+      alpha = Tdecay.Update();
+    }
+    if(TImin.IsEn()){
+      Tmin = TImin.Update();
+    }
+  }
+  void DrawEnd(int it, int bad){
+    String fInfo;
+    fInfo = "Initial cost = " + initial_cost + "\n" + 
+            "Final cost = " + curr_cost + "\n" + 
+            "Iterations = " + it + "\n" + 
+            "Bad moves = " + bad;
+    fill(0);  
+    textAlign(CENTER, TOP);
+    textFont(f, 50); 
+    text("Done!", width/2+145, height/2+90);
+    rectMode(CORNER);
+    textAlign(CENTER);
+    textFont(f, 25); 
+    text(fInfo, width/2+10, height/2+150, 290, 500);
+  }
 }

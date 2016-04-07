@@ -22,13 +22,14 @@ class Button {
   void Draw() {
     fill(c);  
     stroke(0);
-    strokeWeight(4);
+    strokeWeight(3);
     rectMode(CORNER);
-    rect(x, y, w, h, 10);
+    rect(x, y, w, h, 5);
     textAlign(CENTER, CENTER);
     fill(0);
     textFont(f, fs);    
-    text(label, x + (w/2), y + (h/2));
+    text(label, x + (w/2), y + (h/2)-3);
+    redraw();
   }
   
   boolean MouseIsOver() {

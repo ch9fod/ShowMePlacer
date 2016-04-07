@@ -27,6 +27,7 @@ class Nodes {
       fill(0);
       textFont(f, fs);    
       text(id, x0m+8, y0m+8);
+      redraw();
     }
   }
   void Update(boolean Enabled,int Xpos, int Ypos, color Color) {
@@ -41,7 +42,7 @@ class Nodes {
     en = false;
   }
   boolean MouseIsOver() {
-    if (mouseX > x0m-8 && mouseX < x0m+8 && mouseY > y0m-8 && mouseY < y0m+8) {
+    if (mouseX > x0m-15 && mouseX < x0m+15 && mouseY > y0m-15 && mouseY < y0m+15) {
       return true;
     }
     return false;

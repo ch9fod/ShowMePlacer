@@ -95,4 +95,10 @@ class Grid {
         snodes[i].Draw(f);
     }
   }
+  void Reset(){
+    x0 = width/2-225;
+    y0 = height/2-330;
+    Ix0 = width/2-270;
+    Iy0 = height/2-330;
+  }  
 }
