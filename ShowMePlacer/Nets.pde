@@ -1,4 +1,4 @@
-class Nets {
+class Nets { //Nets class.
   int id,iIs=0,iOs=0,iN=0;    
   IntList Is, Os, nodes;
   boolean en = false;

@@ -1,4 +1,4 @@
-class TInput {
+class TInput {//Text input class
   
   PFont f;
   String label, def;

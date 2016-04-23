@@ -1,4 +1,4 @@
-DrawScene ds; //<>//
+DrawScene ds;
 int scst = 0;
 void setup() {
   fullScreen(2);
@@ -7,28 +7,21 @@ void setup() {
   ds = new DrawScene();
   ds.scene1();  //draws first scene
 }
-void draw() {
+void draw() {  //no code on draw
 }
 void mouseReleased() {
   switch(scst){
     case 0:
-      scst = ds.sc1_CheckAndUpdate();  //Checks for Start Button
+      scst = ds.sc1_CheckAndUpdate();  //checks for Start Button
       break;                            
     case 1:
-      scst = ds.sc2_CheckAndUpdate();
+      scst = ds.sc2_CheckAndUpdate();//checks for buttons inside scene2
       break;
     case 2:
-      scst = ds.sc3_CheckAndUpdate();      
+      scst = ds.sc3_CheckAndUpdate();//checks for buttons inside scene3      
       break;
   }
 }
-void keyReleased() {
+void keyReleased() { // this is used for keyboard entry
     ds.CheckKey();
 }
-  //import ddf.minim.*;
-  //Minim minim;
-  //AudioPlayer song1,song2,song3;
-  //minim = new Minim(this);
-  //song1 = minim.loadFile("sc1.mp3");
-  //song2 = minim.loadFile("sc2.mp3");
-  //song3 = minim.loadFile("sc3.mp3");

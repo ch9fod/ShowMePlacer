@@ -1,4 +1,4 @@
-class Grid {
+class Grid {//class that controls the grid of blocks
   PFont f;    
   int nNodes;
   int size = 40;

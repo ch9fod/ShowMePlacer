@@ -1,4 +1,4 @@
-class IO {
+class IO { //class that controls the IOs
   int nNodes;
   int x0m,y0m;
   color c = #FFFFFF;

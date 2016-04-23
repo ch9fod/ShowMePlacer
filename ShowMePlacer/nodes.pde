@@ -1,4 +1,4 @@
-class Nodes {
+class Nodes {// Nodes class
   int nNodes;
   int x0m,y0m;
   color c,bc;

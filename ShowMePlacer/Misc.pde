@@ -1,4 +1,4 @@
-class Button {
+class Button {//Button class
   PFont f;    
   color c;  
   String label;
